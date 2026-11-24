@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f9f8f4">
+  <meta name="theme-color" content="#073968">
   <meta name="description" content="CallFlow — a guided call-documentation learning experience.">
   <title>CallFlow — Learn the flow. Build the habit.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --paper:#f9f8f4;--ink:#263a2d;--muted:#7e8b80;--sage:#698671;--sage-dark:#3b5946;--soft:#edf2ea;--white:#fffefa;--line:#e0e7dd;--alert:#956f51;--shadow:0 18px 50px rgba(47,69,51,.045); }
     * {box-sizing:border-box}
@@ -157,6 +157,119 @@
     @media(max-width:780px){.splitGrid{grid-template-columns:1fr}.stage.stageWide{max-width:700px}.workPanel{padding:20px}}
     @media(max-width:550px){.left{padding:13px 17px}.brand{font-size:20px}.main{padding:13px 20px 24px}.topBadge{padding:8px 10px;font-size:9px}.mobileClient{max-width:55%;font-size:11px;padding:6px 10px}.stage{min-height:400px;padding:40px 0}.fieldsGrid{grid-template-columns:1fr;gap:0}.fieldsGrid .wide{grid-column:auto}.fieldGroup{margin-bottom:16px}h1{font-size:clamp(37px,9vw,49px)}.subtitle{font-size:13px}.field.big{font-size:17px}.foot span:last-child{display:none}.foot{font-size:9px}.readback{padding:16px}.probe{padding:14px}.noteEditor{min-height:320px}.actions{margin-top:25px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+  
+    /* CallFlow v11 — civic blue / white, with a gentle mission-progress aesthetic */
+    :root { --paper:#f4f8ff;--ink:#102a47;--muted:#6f8299;--sage:#006bb6;--sage-dark:#075393;--soft:#ebf4ff;--white:#ffffff;--line:#dae6f4;--alert:#92602e;--shadow:0 20px 55px rgba(10,61,110,.08);--blue:#0072c6;--deep:#073968;--sky:#4ab4ed;--electric:#188bde; }
+    html{scroll-behavior:smooth}
+    body{background:radial-gradient(ellipse at 72% -15%,#e0f0ff 0,transparent 39%),var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif}
+    ::selection{background:#c5e4ff}
+    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #67bfff;outline-offset:3px}
+    .shell{max-width:none;grid-template-columns:222px minmax(0,1fr);min-height:100vh}
+    .left{height:100vh;position:sticky;top:0;background:linear-gradient(165deg,#082d51 0%,#073968 56%,#064c83 100%);border-right:0;padding:32px 16px 22px;gap:54px;box-shadow:5px 0 32px rgba(8,45,81,.06);z-index:11}
+    .brand{color:#fff;font:800 25px/1 'Manrope',sans-serif;letter-spacing:-1.55px;padding:0 11px}
+    .mark{border:1px solid #87cafa;background:#eaf6ff;color:#075393;font:800 18px 'Manrope',sans-serif;width:36px;height:36px;box-shadow:0 5px 16px #001e3a33}
+    .brandDot{color:#7dcaff}
+    .sideSteps{gap:9px}
+    .sideStep{color:#c2ddf4;font-size:12px;border:1px solid transparent;border-radius:13px;min-height:48px;padding:10px 12px;transition:background .22s ease,border-color .22s ease,transform .22s ease}
+    .sideStep .num{border-color:#749abd55;background:#ffffff0d;color:#bcdcf4;font-weight:800;font-size:10px}
+    .sideStep:hover:not(:disabled){transform:translateX(3px);background:#ffffff14;color:#fff}
+    .sideStep.active{color:white;background:#ffffff1e;border-color:#ffffff35;box-shadow:0 12px 24px #001d3630}
+    .sideStep.active .num{border-color:#97dbff;background:#ffffff;color:#086da9}
+    .sideStep.done{color:#e0f4ff}
+    .sideStep.done .num{border-color:#5bc5ff;background:#3b9ed844;color:#e9f9ff}
+    .sideFooter{color:#98bad7;border-top-color:#ffffff29;padding:19px 12px}
+    .main{min-height:100vh;padding:23px clamp(25px,4.4vw,78px) 22px}
+    .top{position:sticky;top:14px;z-index:15;justify-content:flex-start;align-items:center;gap:15px;padding:13px 17px;background:#fff;border:1px solid #d9e6f6;border-radius:18px;box-shadow:0 13px 45px rgba(10,54,99,.065);min-height:78px;backdrop-filter:blur(14px)}
+    .topBadge{border:1px solid #cae6fa;background:#f0f9ff;color:#07699f;border-radius:50px;padding:11px 14px;letter-spacing:.75px;font-size:10px;white-space:nowrap}
+    .greenDot{width:8px;height:8px;background:#00a7c7;box-shadow:0 0 0 4px #00a7c71c;animation:statusPulse 2.7s ease-in-out infinite}
+    .topBadge.complete{background:#e9f6ff;border-color:#afd5f1;color:#095d93}
+    .topBadge.complete .greenDot{animation:none;background:#168fc2}
+    .topClient{display:flex;align-items:center;gap:11px;border-left:1px solid #dfe9f6;padding-left:19px;min-width:0;flex:1}
+    .topClientAvatar{width:42px;height:42px;display:grid;place-items:center;flex:none;border-radius:13px;background:linear-gradient(145deg,#cceaff,#ecf7ff);color:#075393;font:800 19px 'Manrope',sans-serif;border:1px solid #bbdef7}
+    .topClientCopy{display:grid;gap:2px;min-width:0}
+    .topClientLabel{font-size:10px;letter-spacing:1.05px;font-weight:800;color:#7388a3;text-transform:uppercase}
+    .topClientName{font:800 16px/1.3 'Manrope',sans-serif;color:#102e51;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+    .topAssist{display:flex;align-items:center;gap:7px;color:#487392;font-size:10px;letter-spacing:.65px;text-transform:uppercase;font-weight:800;white-space:nowrap;border-radius:99px;background:#edf6ff;padding:10px 13px}
+    .assistantSpark{display:inline-grid;place-items:center;width:17px;height:17px;background:#cfe9fb;border-radius:6px;color:#0479bb;font-size:14px}
+    .progressTop{font-size:11px;margin:27px 0 12px;color:#68849d;font-weight:700}
+    .progressTop strong{color:#075393}
+    .progressTrack{height:7px;background:#e1edfa;box-shadow:inset 0 0 0 1px #d5e4f3}
+    .progressFill{background:linear-gradient(90deg,#0074be,#33b5eb);transition:width .65s cubic-bezier(.22,1,.36,1);position:relative}
+    .progressFill:after{content:'';position:absolute;right:0;top:-3px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #0877c8;box-shadow:0 0 0 4px #0877c81c}
+    .stage{max-width:810px;min-height:580px;padding:48px 0 68px}
+    .stage.stageWide{max-width:1200px}
+    .stepTag{color:#0077c6;font-size:11px;letter-spacing:1.9px;margin-bottom:17px}
+    h1{font:800 clamp(35px,4.25vw,56px)/1.15 'Manrope',sans-serif;letter-spacing:-1.85px;margin-bottom:19px}
+    h1 em{color:#0076c3;font-style:normal}
+    .subtitle{color:#667e99}
+    .fieldLabel{color:#5a7794;font-size:11px;letter-spacing:1.05px}
+    .field{background:#fff;border:1px solid #d9e6f5;border-radius:12px;padding:14px 16px;color:#0a2947;font-size:15px;box-shadow:0 6px 22px rgba(10,51,96,.035);transition:border-color .22s ease,box-shadow .22s ease,transform .22s ease}
+    .field:focus{border-color:#128bde;box-shadow:0 0 0 4px #128bde17;outline:0;transform:translateY(-1px)}
+    .field::placeholder{color:#a6b8cb}
+    .field.big{font-size:18px;line-height:1.65}
+    .prefill{font:700 18px/1.5 'Manrope',sans-serif;color:#0b6bac}
+    .primary{background:linear-gradient(120deg,#006bb6,#0789d7);border-radius:11px;font-size:13px;box-shadow:0 13px 28px #0072c52a;padding:16px 21px;transition:transform .23s cubic-bezier(.2,.8,.2,1),box-shadow .23s ease,filter .23s ease}
+    .primary:hover:not(:disabled){background:linear-gradient(120deg,#005a9f,#0876bd);transform:translateY(-2px);box-shadow:0 17px 31px #0072c53b}
+    .primary:active:not(:disabled){transform:translateY(0) scale(.98)}
+    .secondary{color:#236c9c;transition:color .2s ease,transform .2s ease}
+    .secondary:hover{color:#06477e;transform:translateX(-2px)}
+    .foot{border-top-color:#d8e5f5;color:#8199af}
+    .readback{background:#eaf4ff;border:1px solid #d2e6f7;border-radius:15px}
+    .readbackTitle{color:#176a9e}
+    .readback p{color:#214e77}
+    .typeChoice,.actionChoice{background:#fff;border-color:#d9e6f5;color:#496c89;box-shadow:0 5px 18px rgba(10,54,99,.03);transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease}
+    .typeChoice:hover,.actionChoice:hover{border-color:#77bce8;transform:translateY(-2px);box-shadow:0 11px 26px #0b70b512}
+    .typeChoice.selected,.actionChoice.selected{background:#e9f5ff;border-color:#0587d5;color:#075393;box-shadow:0 0 0 3px #0684cf10}
+    .typeChoice.selected .typeMark{background:#057fc7;border-color:#057fc7}
+    .actionChoice input,.verifyRow input{accent-color:#0072c6}
+    .workPanel{border:1px solid #dbe8f7;background:#fff;border-radius:20px;padding:24px;box-shadow:0 16px 42px rgba(10,54,99,.055)}
+    .actionPanel{border-color:#cfe1f5;background:linear-gradient(180deg,#f1f8ff 0%,#eaf4ff 100%)}
+    .panelHeading h2{font:800 22px/1.3 'Manrope',sans-serif;letter-spacing:-.6px}
+    .panelEyebrow{border-color:#c6e1f7;background:#e8f5ff;color:#0575b9;font-weight:800}
+    .holdCallout{background:#dcefff;border-color:#b5d8f4;color:#114e83}
+    .holdIcon{background:#c0e3ff;color:#096da9}
+    .outcomeDetails{border-top-color:#d3e3f2}
+    .verifyRow{border-bottom-color:#d4e5f5}
+    .verifyCopy strong{color:#1e537e}.verifyCopy span{color:#6485a0}
+    .probeButton{background:#eff8ff;color:#086bab;border:1px solid #c9e2f7;border-radius:10px;transition:transform .2s ease,background .2s ease}
+    .probeButton:hover{background:#dff1ff;transform:translateY(-1px)}
+    .probeStatus{color:#6b86a0}
+    .probes{gap:13px}
+    .probe{background:#fff;border:1px solid #deebf8;border-radius:14px;padding:16px;box-shadow:0 5px 16px #104f8c08;transition:transform .25s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease;animation:cardRise .35s cubic-bezier(.22,1,.36,1) both}
+    .probe:hover{border-color:#b9d7ed}
+    .probe.answered{background:linear-gradient(130deg,#f6fbff,#ebf7ff);border-color:#61b5ee;box-shadow:0 0 0 2px #40a4e915,0 10px 28px rgba(10,98,165,.085)}
+    .probe.answered .probeQuestion{font-weight:800;color:#075896}
+    .probeTag{color:#267eae}
+    .probeQuestion{color:#193c61;font-size:13px;line-height:1.55}
+    .probeWhy{color:#62829d}
+    .probeAnswerState{font-size:10px;font-weight:800;letter-spacing:.35px;color:#7b93a9;background:#f0f5fa;border:1px solid #deebf5;padding:5px 8px;border-radius:999px;white-space:nowrap;transition:color .22s,background .22s,border-color .22s}
+    .probe.answered .probeAnswerState{background:#d8f0ff;color:#086ba5;border-color:#9dd5f4}
+    .probeInput{border:1px solid #dce8f5;background:#f8fbff;border-radius:9px;padding:12px 13px;font-size:13px;transition:box-shadow .2s,border-color .2s,background .2s}
+    .probeInput:focus{border-color:#1385cf;background:#fff;box-shadow:0 0 0 3px #1b92dd16;outline:0}
+    .probe.answered .probeInput{font-weight:700;background:#fff;border-color:#b2d9f3}
+    .probeInput::placeholder{color:#9fb2c5}
+    .emptyProbes{background:#eff7ff;border-color:#cfe3f6;color:#3b759a}
+    .resources{border-top-color:#dce9f6}
+    .resourcesTitle{color:#0b5b96}
+    .resourceLink{padding:11px 9px;margin:0 -9px;transition:background .2s,transform .2s}
+    .resourceLink:hover{background:#f1f8ff;transform:translateX(3px)}
+    .resourceIcon{color:#087ebd}.resourceTitle{color:#125b92}.resourceMeta{color:#7793aa}
+    .textLink{color:#0872b6}
+    .noteEditor{background:#fff;border-color:#cfe1f3;color:#173b5e;border-radius:14px;box-shadow:0 9px 25px #114e8508}
+    .noteEditor:focus{border-color:#0879bd;box-shadow:0 0 0 4px #1385cf12}
+    .micro{color:#748ea4}
+    .notice{background:#fff7e9;color:#805b2d}
+    .fade{animation:stageEnter .45s cubic-bezier(.22,1,.36,1) both}
+    @keyframes stageEnter{from{opacity:0;transform:translateY(13px) scale(.996)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes cardRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes statusPulse{0%,100%{box-shadow:0 0 0 3px #00a7c715}50%{box-shadow:0 0 0 7px #00a7c724}}
+    .topTag,.mobileClient,.right{display:none!important}
+    @media (max-width:1130px){.shell{grid-template-columns:196px minmax(0,1fr)}.left{padding:25px 11px}.main{padding:21px 28px}.brand{font-size:22px}.sideStep{gap:9px}}
+    @media (max-width:900px){.shell{display:flex;flex-direction:column}.left{height:auto;position:relative;min-height:auto;padding:14px 19px;gap:0;background:#073968;box-shadow:none;border:0}.brand{padding:0;font-size:22px}.sideSteps,.sideFooter{display:none}.main{min-height:calc(100vh - 65px);padding:16px 20px 24px}.top{position:sticky;top:9px;padding:12px 13px;min-height:70px}.progressTop{margin-top:20px}.stage{min-height:460px;padding:35px 0 60px}}
+    @media (max-width:780px){.splitGrid{grid-template-columns:1fr;gap:16px}.stage.stageWide{max-width:750px}.workPanel{padding:21px}.topAssist{display:none}}
+    @media (max-width:550px){.main{padding:12px 13px 22px}.top{padding:11px;gap:8px;min-height:68px;border-radius:13px}.topBadge{font-size:9px;padding:8px 9px;letter-spacing:.15px}.topClient{padding-left:10px;gap:8px}.topClientAvatar{width:33px;height:33px;border-radius:10px;font-size:16px}.topClientLabel{font-size:9px}.topClientName{font-size:13px}.stage{min-height:390px;padding:36px 0}.typeChoices{grid-template-columns:1fr}.field{font-size:14px}.field.big{font-size:16px}h1{font-size:clamp(32px,9vw,45px);letter-spacing:-1.25px}.panelHeading h2{font-size:20px}}
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
   </style>
 </head>
 <body>
@@ -167,29 +280,20 @@
     <div class="sideFooter">✳<br>Learn the flow.<br>Build the habit.</div>
   </aside>
   <main class="main">
-    <div class="top">
-      <div class="topBadge"><span class="greenDot"></span> Call in progress</div>
-      <div class="topTag">LISTEN · CLARIFY · DOCUMENT</div>
-      <div class="mobileClient" aria-live="polite"><span class="initial" id="mobileInitial">✧</span><span id="mobileName">Your client</span></div>
+    <div class="top" aria-label="Current call" role="status">
+      <div class="topBadge" id="callStateBadge"><span class="greenDot" aria-hidden="true"></span> <span id="callStateLabel">Call in progress</span></div>
+      <div class="topClient" aria-live="polite">
+        <span class="topClientAvatar" id="topClientIcon" aria-hidden="true">✧</span>
+        <span class="topClientCopy"><span class="topClientLabel">Speaking with</span><strong class="topClientName" id="topClientName">Your client</strong></span>
+      </div>
+      <span class="topAssist"><span class="assistantSpark" aria-hidden="true">✦</span> CallFlow assistant</span>
     </div>
     <div class="progressTop"><span id="progressLabel">01 / 04 · Basics</span><strong id="progressPercent">25%</strong></div>
     <div class="progressTrack" role="progressbar" aria-label="CallFlow progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25" id="progressTrack"><div class="progressFill" id="progressFill"></div></div>
     <section class="stage fade" id="stage" aria-live="polite"></section>
     <footer class="foot"><span>✳ &nbsp; Clarity, one call at a time.</span><span>Practice with fictional information only.</span></footer>
   </main>
-  <aside class="right">
-    <div class="asideLabel">Your call companion</div>
-    <div class="clientCard" aria-live="polite">
-      <div class="cardEyebrow">Speaking with</div>
-      <div class="clientIcon" id="clientIcon">✧</div>
-      <div class="clientName" id="clientName">Your client</div>
-      <div class="clientHint">Their name stays here throughout the call.</div>
-      <div class="cardRule"></div>
-      <div class="gentle" id="nameReminder">Use their name naturally.</div>
-    </div>
-    <div class="asideNote"><strong>Clarity over speed.</strong>One step at a time.</div>
-    <div class="asideFooter">INDEPENDENT TRAINING DEMO<br>NOT CONNECTED TO A CRM</div>
-  </aside>
+
 </div>
 <script src="./guides-data.js"></script>
 <script src="./probing-engine.js"></script>
@@ -209,7 +313,7 @@
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const val = v => String(v ?? '').trim() || 'Not provided';
   const first = () => data.fullName.trim().split(/\s+/)[0] || 'The client';
-  const lead = () => first() + ' is calling about' + (data.reason.trim() ? ' ' + data.reason.trim() : '…');
+  const lead = () => { const prefix = first() + ' is calling about'; const reason = data.reason.trim(); return reason.toLowerCase().startsWith(prefix.toLowerCase()) ? reason : prefix + (reason ? ' ' + reason : '…'); };
   const outcomes = {resolved:'Issue was resolved', followup:'More time needed to troubleshoot', escalated:'Escalated to another team'};
   function setStep(n) { if(n===4 && !outcomeComplete()) return; step = Math.max(0, Math.min(4, n)); maxStep = Math.max(maxStep, step); render(); window.scrollTo?.({top:0,behavior:'instant'}); }
   function nav() {
@@ -221,10 +325,10 @@
     $('#progressLabel').textContent = step===4 ? 'Complete · Call notes' : `${String(step+1).padStart(2,'0')} / 04 · ${stages[step]}`;
     $('#progressTrack').setAttribute('aria-valuenow', amount);
     const name = data.fullName.trim() || 'Your client';
-    $('#clientName').textContent = name;
-    $('#mobileName').textContent = name;
-    $('#clientIcon').textContent = $('#mobileInitial').textContent = name==='Your client' ? '✧' : name.charAt(0).toUpperCase();
-    $('#nameReminder').textContent = name==='Your client' ? 'Use their name naturally.' : `Remember to use ${first()}’s name naturally.`;
+    $('#callStateLabel').textContent = step===4 ? 'Call complete' : 'Call in progress';
+    $('#callStateBadge').classList.toggle('complete',step===4);
+    $('#topClientName').textContent = name;
+    $('#topClientIcon').textContent = name==='Your client' ? '✧' : name.charAt(0).toUpperCase();
   }
   function head(tag,title) {return `<div class="stepTag">${tag}</div><h1>${title}</h1>`;}
   function field(key,label,placeholder,opts={}) {
@@ -241,14 +345,15 @@
   function canContinue() {return step===0 ? !!data.fullName.trim() : step===1 ? !!data.reason.trim() : step===3 ? outcomeComplete() : true;}
   function controls(nextLabel='Continue') {return `<div class="actions"><button class="primary" id="next" ${canContinue()?'':'disabled'}>${nextLabel} <span aria-hidden="true">↗</span></button>${step>0?'<button class="secondary" id="back">← Back</button>':''}</div>`;}
   function probeCard(p,i) {
-    return `<div class="probe"><div class="probeHeader"><span class="probeTag">${esc(p.gap||'Follow-up')}</span><button class="remove" data-remove="${i}" aria-label="Remove probing question">Remove</button></div>${p.custom
+    const answered=!!String(p.a||'').trim();
+    return `<div class="probe ${answered?'answered':''}"><div class="probeHeader"><span class="probeTag">${esc(p.gap||'Follow-up')}</span><span class="probeAnswerState" aria-live="polite">${answered?'✓ Answered':'Awaiting answer'}</span></div>${p.custom
       ? `<input class="probeInput" data-question="${i}" value="${esc(p.q)}" placeholder="Type your question…" aria-label="Custom probing question">`
       : `<div class="probeQuestion">${esc(p.q)}</div>${p.why?`<details class="probeWhy"><summary>Why ask?</summary><p>${esc(p.why)}</p></details>`:''}`}
       <label class="fieldLabel" for="answer${i}">Client's answer</label><input class="probeInput" id="answer${i}" data-answer="${i}" value="${esc(p.a||'')}" placeholder="Add their answer…"></div>`;
   }
   function resourcePanel(analysis) {
     const rows=(analysis.resources||[]).map(r=>`<a class="resourceLink" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(r.title)} in a new tab"><span class="resourceIcon" aria-hidden="true">↗</span><span class="resourceCopy"><span class="resourceTitle">${esc(r.title)}</span><span class="resourceMeta">${esc(r.origin)} · ${esc(r.detail)}</span></span></a>`).join('');
-    const info=analysis.referenceCoverage==='possible-guides'?'Possible matches from the local service guide library · Confirm the issue before giving instructions.':analysis.referenceCoverage==='directory'?'No matching guide. Verify against the 311 directory.':analysis.guideId?`Approved portfolio guide ${analysis.guideId} · ${analysis.guideVolume2025.toLocaleString()} 2025 contacts/requests · Check current service details.`:'Questions are based on example public service guidance. Verify current information.';
+    const info=analysis.referenceCoverage==='directory'?'No matching guide. Verify against the 311 directory.':analysis.guideId?`Approved portfolio guide ${analysis.guideId} · ${analysis.guideVolume2025.toLocaleString()} 2025 contacts/requests · Check current service details.`:'Questions are based on example public service guidance. Verify current information.';
     return `<div class="resources">${analysis.routingNote?`<div class="notice" role="status">${esc(analysis.routingNote)}</div>`:""}<div class="resourcesTitle">Relevant service information</div>${rows}<p class="probeStatus">${esc(info)}</p></div>`;
   }
   function callTypeChoices() {
@@ -290,7 +395,7 @@
       case 3:
         html='<div class="stepTag">04 · Probing & action</div>'+`<div class="splitGrid">
           <section class="workPanel probePanel" aria-label="Suggested probing questions"><div class="panelHeading"><span class="panelEyebrow">01</span><h2>Probing questions</h2></div>
-            <div class="probeActions"><button class="probeButton" id="suggest">↻ Refresh suggestions</button><span class="probeStatus" id="probeStatus">${source==='ai'?'AI ranked':guidance.guideId?'Reviewed guide':guidance.referenceCoverage==='possible-guides'?'Clarifying service':'General practice'} · ${esc(guidance.categoryLabel)}</span></div>
+            <div class="probeActions"><button class="probeButton" id="suggest">↻ Refresh suggestions</button><span class="probeStatus" id="probeStatus">${source==='ai'?'AI ranked':guidance.guideId?'Reviewed guide':'General practice'} · ${esc(guidance.categoryLabel)}</span></div>
             ${guidance.safetyNote?`<div class="notice" role="status">${esc(guidance.safetyNote)}</div>`:''}
             <div class="probes" id="probes">${data.probes.length?data.probes.map(probeCard).join(''):'<div class="emptyProbes">No further questions suggested based on the details captured.</div>'}</div>${data.probes.length<2?'<button class="textLink" id="add">+ Add a question</button>':''}<div id="serviceResources">${resourcePanel(guidance)}</div>
           </section>
@@ -309,8 +414,8 @@
     bind();
   }
   function noteText() {
-    // Only record answered probing questions. The question text itself is not included.
-    const answers=allProbeRecords().filter(p=>String(p.a||'').trim()).map(p=>`${(p.custom?'Additional information':p.gap)||'Additional information'}: ${p.a.trim()}`);
+    // Record answered questions and their corresponding answers, including historical answers when guidance changes.
+    const answers=allProbeRecords().filter(p=>String(p.a||'').trim()).map(p=>`Question: ${String(p.q||'Follow-up question').trim()}\nAnswer: ${String(p.a).trim()}`);
     const sections=[
       'CALL NOTES',
       `CALL TIMESTAMPS\nStarted: ${timestamp(callStartedAt)}\nCompleted: ${timestamp(callEndedAt)}`,
@@ -319,7 +424,7 @@
     ];
     if (data.callType!=='unsure') sections.push(`CALL TYPE\n${data.callType==='service_request'?'Service request':'General inquiry'}`);
     if (data.extra.trim()) sections.push(`ADDITIONAL DETAILS\n${data.extra.trim()}`);
-    if (answers.length) sections.push(`INFORMATION CLARIFIED\n${answers.join('\n')}`);
+    if (answers.length) sections.push(`PROBING QUESTIONS & ANSWERS\n${answers.join('\n\n')}`);
     if (data.outcome) {
       const action=[`Status: ${outcomes[data.outcome]}`];
       if (data.outcome==='resolved' && data.resolvedNotes.trim()) action.push(`Resolution comments: ${data.resolvedNotes.trim()}`);
@@ -370,7 +475,20 @@
     $('#suggest')?.addEventListener('click',suggest);
     $('#add')?.addEventListener('click',()=>{if(data.probes.length<2)data.probes.push({q:'',a:'',gap:'Your question',custom:true});render();});
     $('#probes')?.addEventListener('input',e=>{
-      if(e.target.matches('[data-answer]')){const p=data.probes[Number(e.target.dataset.answer)];if(p){p.a=e.target.value;updateKnowledgePanel();}}
+      if(e.target.matches('[data-answer]')){
+        const p=data.probes[Number(e.target.dataset.answer)];
+        if(p){
+          p.a=e.target.value;
+          const card=e.target.closest('.probe');
+          const answered=!!p.a.trim();
+          if(card){
+            card.classList.toggle('answered',answered);
+            const status=card.querySelector('.probeAnswerState');
+            if(status)status.textContent=answered?'✓ Answered':'Awaiting answer';
+          }
+          updateKnowledgePanel();
+        }
+      }
       if(e.target.matches('[data-question]')){const p=data.probes[Number(e.target.dataset.question)];if(p)p.q=e.target.value;}
     });
     $('#probes')?.addEventListener('focusout',e=>{
@@ -379,7 +497,6 @@
         if(syncProbes())render();
       }
     });
-    $('#probes')?.addEventListener('click',e=>{if(e.target.matches('[data-remove]')){data.probes.splice(Number(e.target.dataset.remove),1);syncProbes(true);render();}});
     document.querySelectorAll('input[name="callType"]').forEach(el=>el.addEventListener('change',()=>{data.callType=el.value;render();}));
     document.querySelectorAll('input[name="outcome"]').forEach(el=>el.addEventListener('change',()=>{data.outcome=el.value;render();}));
     document.querySelectorAll('[data-verify]').forEach(el=>el.addEventListener('change',()=>{data.verified[el.dataset.verify]=el.checked;}));
@@ -422,7 +539,7 @@
     const a=analyzeCurrentCall();
     const panel=$('#serviceResources');if(panel)panel.innerHTML=resourcePanel(a);
     const status=$('#probeStatus');
-    if(status)status.textContent=(a.guideId?'Reviewed guide':a.referenceCoverage==='possible-guides'?'Clarifying service':'General practice')+' · '+a.categoryLabel;
+    if(status)status.textContent=(a.guideId?'Reviewed guide':'General practice')+' · '+a.categoryLabel;
   }
   function advance() {
     if(!canContinue()) return;
