@@ -56,3 +56,19 @@ Sample scenarios:
 There are **no live City website scrapes**, no active AI requests, and no API keys required for this matching. Questions are reviewed training templates rather than official City scripts.
 
 Run `node tests/guide-matching.test.js` locally to check all 20 guide categories and the property-tax refinement examples. For privacy, test only with fictional caller information.
+
+## Version 10 · Plain-language service matching and call-type guidance
+
+All 20 approved guides now include a separate set of **common-language aliases**, alongside the original approved questions and official source links. Examples include *house taxes*, *my bin is broken*, *the garbage truck skipped me*, *my landlord is not fixing my apartment*, and *my drains are backing up*.
+
+In **03 · Paraphrase**, the agent can select **General inquiry**, **Service request**, or **Not sure yet** (the default). The choice helps CallFlow narrow vague inquiries without overriding a clear match to a service guide.
+
+If the issue is ambiguous (for example, *a problem with my water bill*), CallFlow first suggests up to **two classification questions** and shows possible source links. When an answer identifies the underlying service (paying a utility bill, a water-meter reading, or a utility charge), it switches to the appropriate guide and updates the links, preserving answered details in the final call notes.
+
+All matching happens **locally**; this version does not enable AI, scrape the City website, or transmit caller data externally. The guide library remains an educational portfolio resource, not official City instructions.
+
+To check the matching logic locally, run:
+
+```bash
+node tests/guide-matching.test.js
+```
