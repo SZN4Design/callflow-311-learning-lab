@@ -154,30 +154,76 @@
     blockageScope:/\b(?:one (?:drain|fixture|toilet)|multiple drains|several drains|all (?:drains|fixtures))\b/i,
     backupPresent:/\b(?:backing up|backed up|sewage (?:in|inside)|no backup|not backing up|wastewater)\b/i
   };
-  // Match approved service titles even when the caller uses casual, broad language.
-  // More specific topics (VHT, pre-authorized payments) take priority over Property Tax.
-  function findApprovedGuide(context) {
-    const hay=' '+normalize(context)+' ';
-    const normalized=normalize(context);
-    const matches=[];
-    for(const guide of approvedGuides){
-      const matched=(guide.aliases||[]).filter(a=>hay.includes(' '+normalize(a)+' '));
-      if(!matched.length)continue;
-      const quality=Math.max(...matched.map(a=>normalize(a).length));
-      matches.push({guide,score:quality+Math.min(matched.length,3)*2});
-    }
-    const lookup=id=>approvedGuides.find(g=>g.id===id)||null;
-    if(/\b(?:vacant home tax|vacancy tax|vht|vacant home declaration)\b/.test(normalized))return lookup('G02');
-    const taxContext=/\b(?:tax|taxes|property|ptp)\b/.test(normalized);
-    const ptpContext=/\b(?:pre authorized|preauthorized|automatic (?:property )?tax payments?|auto withdrawal|direct debit|ptp|monthly (?:property )?tax payment plan|tax payment plan)\b/.test(normalized);
-    if(taxContext&&ptpContext)return lookup('G07');
-    if(/\b(?:property tax(?:es)?|tax bill|property tax account|taxes on my (?:home|house|property))\b/.test(normalized) && !matches.some(x=>x.guide.id==='G02')){
-      // Preserve more specific matches for property-related services.
-      const specific=matches.filter(x=>!['G01','G02','G07'].includes(x.guide.id));
-      if(!specific.length)return lookup('G01');
-    }
+  // Match common spoken language without requiring agents to know official titles.
+  // A call-type hint is a tie-breaker, never a substitute for the caller's facts.
+  const byId = id => approvedGuides.find(g => g.id===id) || null;
+  const hasPhrase = (hay,phrase) => hay.includes(' '+normalize(phrase)+' ');
+  const specificSignals = [
+    ['G02', /\b(?:declare (?:an? )?empty (?:house|home)|empty (?:house|home) (?:tax|declaration)|vacant home tax|vacancy tax|vht|occupancy declaration|vacant property declaration|vacancy declaration)\b/],
+    ['G07', /\b(?:pre authorized|preauthorized|auto(?:matic)? tax pay|tax (?:payment )?plan|monthly (?:property )?tax pay|automatic (?:property )?tax withdrawal|ptp|tax direct debit)\b/],
+    ['G05', /\b(?:water meter|meter reading|estimated (?:water )?bill|estimate on (?:my )?water bill)\b/],
+    ['G09', /\b(?:water bill (?:is )?(?:too high|wrong|incorrect)|water (?:charge|fee|rate)|solid waste (?:charge|fee)|garbage (?:charge|fee)|utility charge|water bill (?:too high|incorrect|wrong)|charged too much for water)\b/],
+    ['G03', /\b(?:pay(?:ing)? (?:my |the )?(?:water|utility) bill|(?:water|utility) bill payment|utility payment|pay (?:my )?utilities|paid (?:my )?utilities)\b/],
+    ['G06', /\b(?:change (?:my )?mailing address|new home ?owner|bought (?:a|my) house|sold (?:my|the) (?:house|property)|ownership change)\b/],
+    ['G11', /\b(?:(?:broken|damaged|cracked|replace|repair|fix) (?:my |the )?(?:garbage |green |blue |recycling )?bin|bin (?:is )?(?:broken|cracked|damaged)|bin lid (?:is )?(?:broken|missing|cracked)|wheel fell off (?:the )?bin)\b/],
+    ['G18', /\b(?:(?:missed|skipped|didnt take|didnt collect) (?:my |the )?(?:garbage|trash|recycling|green bin|blue bin|pickup|collection)|(?:garbage|trash|recycling|green bin|blue bin) (?:was |were |is |has |not )*(?:not collected|not picked up|left behind|missed|wasnt collected|not emptied))\b/],
+    ['G10', /\b(?:drop off|dropoff|waste depot|transfer station|city dump|where (?:can|do) i (?:dump|bring)|dispose of)\b/],
+    ['G08', /\b(?:(?:old |my )?(?:couch|sofa|mattress|fridge|appliance|furniture)\b.{0,35}\b(?:pickup|pick up|collection|collect|take away)|(?:pick up|take away|collect|remove) (?:old |my )?(?:couch|sofa|mattress|fridge|appliance|furniture)|(?:couch|sofa|mattress|furniture|fridge|appliance|oversized|bulky) (?:pickup|pick up|collection|removal))\b/],
+    ['G12', /\b(?:dead (?:animal|wildlife|raccoon|squirrel|bird|fox)|animal carcass|roadkill|found a dead animal)\b/],
+    ['G14', /\b(?:injured|hurt|wounded|bleeding|limping) (?:animal|wildlife|raccoon|bird|squirrel)|(?:animal|bird) (?:is )?(?:injured|hurt|bleeding|limping)|broken wing\b/],
+    ['G16', /\b(?:snow|ice|icy|slippery|shovel|salting|not cleared)\b.{0,40}\b(?:sidewalk|footpath|walkway)\b|\b(?:sidewalk|footpath|walkway)\b.{0,40}\b(?:snow|ice|icy|slippery|shovel|not cleared)\b/],
+    ['G17', /\b(?:road.{0,35}hole|street.{0,35}hole|pothole|hole in (?:the )?(?:road|street)|road crater|broken pavement|road damage|road surface cracked)\b/],
+    ['G20', /\b(?:drains? (?:are |is )?(?:backing up|backed up)|blocked sewer|sewer backup|sewer backed up|sewage (?:in|coming)|blocked (?:basement|main) drain|drains backed up|sewer (?:line )?clogged|wastewater backing up)\b/],
+    ['G19', /\b(?:noise complaint|loud (?:music|party|neighbou?r|construction)|noise (?:late|at night)|music blasting|barking dog|noisy neighbou?r|party noise)\b/],
+    ['G15', /\b(?:tree (?:prun|trim|branch|limb)|prun(?:e|ing) (?:a|the|city) tree|trim (?:a|the|city) tree|overgrown tree|branches (?:over|hanging|blocking))\b/],
+    ['G13', /\b(?:property standards|landlord (?:is not fixing|isnt fixing|wont|will not|not) (?:fix|repair)?|rental maintenance|mould in rental|mold in rental|property (?:maintenance|in bad condition)|building falling apart)\b/],
+    ['G04', /\b(?:parking enforcement|illegally parked|illegal parking|car (?:is )?blocking (?:my )?driveway|parked in front of (?:my )?driveway|parking complaint|parking violation|double parked)\b/],
+    ['G01', /\b(?:property tax|property taxes|house taxes|city taxes|tax bill|tax due date|tax statement)\b/]
+  ];
+  // When a phrase is too broad to route safely, ask a clarifying question
+  // rather than confidently choosing a potentially incorrect City service.
+  const ambiguityGroups = [
+    {id:'billing',pattern:/\b(?:bill|billing|payment|charge|water bill|utility bill)\b/,clear:/\b(?:property tax|vacant home tax|pre authorized|preauthorized|tax (?:payment )?plan|tax plan|pay(?:ing)? (?:my |the )?(?:water|utility)|water meter|estimated (?:water )?bill|solid waste (?:fee|charge)|water (?:fee|charge)|water bill (?:is )?too high|water bill (?:is )?incorrect|water bill (?:is )?wrong)\b/,
+      label:'Clarify billing',kind:'general_inquiry',guideIds:['G01','G03','G05','G09'],questions:[['billingType','Is this about property tax, a water/utility bill, or another City charge?'],['billingNeed','Is the caller asking about paying, an amount charged, or a meter reading?']]},
+    {id:'tax',pattern:/\b(?:tax|taxes)\b/,clear:/\b(?:property tax|property taxes|house taxes|city taxes|vacant home|vht|payment plan|pre authorized|preauthorized)\b/,
+      label:'Clarify taxes',kind:'general_inquiry',guideIds:['G01','G02','G07'],questions:[['taxService','Is this about property tax, Vacant Home Tax, or a tax payment plan?'],['taxNeed','Does the caller need a bill, a due date, or help with a declaration?']]},
+    {id:'waste',pattern:/\b(?:garbage|trash|waste|green bin|blue bin|recycling|bin|bins|pickup|pick up)\b/,clear:/\b(?:missed|skipped|not collected|not picked up|not emptied|broken|damaged|cracked|repair|replace|lid|drop off|dropoff|depot|furniture|mattress|sofa|couch|fridge|appliance|oversized|large item|solid waste fee)\b/,
+      label:'Clarify waste service',kind:'service_request',guideIds:['G11','G18','G08','G10'],questions:[['wasteService','Is the issue a missed collection, a damaged bin, or something that needs disposing of?'],['wasteType','Is this about garbage, green bin organics, or recycling?']]},
+    {id:'animal',pattern:/\b(?:animal|animals|wildlife|raccoon|squirrel|bird)\b/,clear:/\b(?:dead|roadkill|carcass|injured|hurt|wounded|bleeding|limping|broken wing)\b/,
+      label:'Clarify animal concern',kind:'service_request',guideIds:['G12','G14'],questions:[['animalStatus','Is the animal injured, deceased, or is there another concern?'],['animalLocation','Where is the animal located?']]},
+    {id:'roads',pattern:/\b(?:road|street|sidewalk|pavement)\b/,clear:/\b(?:snow|ice|icy|shovel|not cleared|pothole|hole|crater|crack|damage|broken)\b/,
+      label:'Clarify road service',kind:'service_request',guideIds:['G16','G17'],questions:[['roadIssue','Is this about road damage, a pothole, or snow/ice on a sidewalk?'],['roadLocation','Where is the issue located?']]},
+    {id:'property',pattern:/\b(?:property|building|house)\b/,clear:/\b(?:property tax|property taxes|house taxes|city taxes|vacant home|empty house|declare|occupancy|landlord|maintenance|bylaw|standards|mailing|address change|owner|sold|bought|broken)\b/,
+      label:'Clarify property service',kind:'general_inquiry',guideIds:['G01','G06','G13'],questions:[['propertyTopic','Is this about property taxes, ownership/address details, or a maintenance complaint?'],['propertyNeed','What information or assistance does the caller need?']]},
+    {id:'water',pattern:/\b(?:water|drain|sewer)\b/,clear:/\b(?:bill|meter|charge|fee|payment|drain blocked|blocked drain|sewer backed up|sewage|backup|backing up)\b/,
+      label:'Clarify water service',kind:'general_inquiry',guideIds:['G03','G05','G20'],questions:[['waterTopic','Is this about a water bill, water meter, or a drainage/sewer issue?'],['waterNeed','Is the caller requesting information or reporting a problem?']]}
+  ];
+  function findAmbiguous(context) {
+    const t=normalize(context);
+    return ambiguityGroups.find(g=>g.pattern.test(t)&&!g.clear.test(t))||null;
+  }
+  function guideScore(guide,hay,callType) {
+    const terms=[...(guide.aliases||[]),...(guide.casualAliases||[])];
+    const found=terms.filter(a=>hasPhrase(hay,a));
+    if(!found.length)return 0;
+    const specificity=Math.max(...found.map(a=>normalize(a).split(' ').length));
+    const longest=Math.max(...found.map(a=>normalize(a).length));
+    return 18 + Math.min(longest,45) + 8*Math.min(specificity,4) + Math.min(found.length,4)*3 + (callType&&callType!=='unsure'&&guide.kind===callType?12:0);
+  }
+  function findApprovedGuide(context,callType='unsure') {
+    const normalized=normalize(context),hay=' '+normalized+' ';
+    // Specific intents win when a generic phrase appears earlier in the call.
+    for(const [id,pattern] of specificSignals) if(pattern.test(normalized))return byId(id);
+    const matches=approvedGuides.map(guide=>({guide,score:guideScore(guide,hay,callType)})).filter(x=>x.score>0);
     matches.sort((a,b)=>b.score-a.score||a.guide.number-b.guide.number);
     return matches[0]?.guide||null;
+  }
+  function clarifyFromGroup(group,callType,context,answeredIds) {
+    const kind=callType==='unsure'?group.kind:callType;
+    const questions=group.questions.filter(([id])=>!answeredIds.has('clarify-'+group.id+'-'+id)).slice(0,2).map(([id,question])=>({id:'clarify-'+group.id+'-'+id,gap:'Clarification',question,why:'Helps identify the appropriate service before giving specific instructions.'}));
+    const resources=group.guideIds.map(byId).filter(Boolean).map(g=>({title:g.title,url:g.sources[0].url,origin:g.sources[0].publisher,detail:'Possible service · Confirm with caller'})).slice(0,3);
+    if(!resources.length)resources.push(resourceIndex.hub);
+    return {category:'clarify-'+group.id,categoryLabel:group.label,guideId:null,questions,candidates:questions,resources,referenceCoverage:'possible-guides',source:'approved-library',safetyNote:'',routingNote:''};
   }
   const extraResources={
     taxPay:{title:'Pay Your Property Tax Bill',url:'https://www.toronto.ca/services-payments/property-taxes-utilities/property-tax/pay-your-property-tax-bill/',detail:'Property tax payment options',origin:'City of Toronto'},
@@ -211,10 +257,29 @@
     const answers=probes.filter(p=>String(p.a||'').trim());
     // Re-evaluate the local guide match as agents record details and probing answers.
     const context=[issue,details,...answers.map(p=>p.a)].join(' ');
-    const guide=findApprovedGuide(context);
-    if(!guide)return analyzeFallback(input);
-    const safetyNote=urgent.test(context)?'Potential immediate safety concern. Follow your organization’s emergency procedures rather than relying on probing suggestions.':'';
+    const callType=['general_inquiry','service_request'].includes(input.callType)?input.callType:'unsure';
     const answeredIds=new Set(answers.map(p=>String(p.id||p.gapId||'')));
+    const broad=findAmbiguous(context);
+    const narrowed=answers.some(p=>String(p.id||'').startsWith('clarify-') && String(p.a||'').trim());
+    // A broad topic needs clarification before assigning a specific guide.
+    if(broad&&!narrowed)return clarifyFromGroup(broad,callType,context,answeredIds);
+    const guide=findApprovedGuide(context,callType);
+    if(!guide){
+      const fallback=analyzeFallback(input);
+      if(callType==='general_inquiry'){
+        fallback.categoryLabel='General inquiry · Needs clarification';
+        fallback.questions=[{id:'general-service',gap:'Service',question:'Which City service is the caller asking about?',why:'Identifies where to direct the caller.'},{id:'general-request',gap:'Question',question:'What information does the caller need?',why:'Clarifies their request.'}];
+      } else if(callType==='service_request'){
+        fallback.categoryLabel='Service request · Needs clarification';
+        fallback.questions=[{id:'request-issue',gap:'Issue',question:'What specifically needs to be reported or fixed?',why:'Identifies the appropriate service request.'},{id:'request-location',gap:'Location',question:'Where is the issue located?',why:'Identifies the service location.'}];
+      } else {
+        fallback.categoryLabel='Service type not yet identified';
+        fallback.questions=[{id:'unsure-type',gap:'Call type',question:'Does the caller need information or to report something that needs attention?',why:'Helps determine the call type.'},{id:'unsure-issue',gap:'Service',question:'Which City service or issue are they calling about?',why:'Narrows the service category.'}];
+      }
+      fallback.candidates=fallback.questions;
+      return fallback;
+    }
+    const safetyNote=urgent.test(context)?'Potential immediate safety concern. Follow your organization’s emergency procedures rather than relying on probing suggestions.':'';
     const candidates=safetyNote?[]:guide.questions.filter(q=>{
       if(answeredIds.has(q.id))return false;
       if(answers.some(p=>normalize(p.q)===normalize(q.question)))return false;
@@ -256,4 +321,3 @@
   }
   return {analyze,validateGenerated,findApprovedGuide,approvedGuides,playbookLabels:playbooks.map(p=>p.label),resourceIndex};
 });
-
