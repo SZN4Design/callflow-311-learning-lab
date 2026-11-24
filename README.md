@@ -72,3 +72,14 @@ To check the matching logic locally, run:
 ```bash
 node tests/guide-matching.test.js
 ```
+
+## Version 11 · Blue-and-white assistant experience
+
+- **Call in progress** and **Speaking with** now appear together in the top status bar (the status updates to **Call complete** on the final screen).
+- The earlier name reminders and “Clarity over speed” sidebar callout have been removed.
+- A brighter, City-of-Toronto-inspired blue-and-white visual system, smooth progress transitions, animated states and responsive panels update the look. This independent prototype does **not** use official City branding.
+- Suggested probing questions no longer show a **Remove** button. Each answer gets a visible **✓ Answered** state and highlighted card as soon as the agent enters it.
+- Only **answered** probing questions are included in CRM-ready notes, alongside the exact question and agent-captured answer. Answers remain in the notes even if a more specific guide becomes relevant.
+- Corrected a duplicated call-reason prefix in notes when the agent types the full prewritten sentence.
+
+The local, rules-based 20-guide system is unchanged. No City website scraping or external AI requests are enabled.
