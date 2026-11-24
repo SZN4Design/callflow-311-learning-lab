@@ -40,3 +40,19 @@ The live site will be hosted by Vercel; this GitHub repository does **not** depl
 ## Project source
 
 This repository publishes a **self-contained preview** for straightforward Vercel deployment. The original modular development package, including the optional AI endpoint, tests and permission-gated source-review scripts, is kept separately and can be uploaded for further development.
+
+## Guide matching and contextual references (November 2026 update)
+
+The CallFlow form reads the **locally stored** `data/311-guides.json` library through `guides-data.js` and `probing-engine.js`. Entering **Step 4 — Probing & action** automatically matches the call to one of 20 approved guides and fills up to two probing questions. No manual request is necessary.
+
+Answers in Step 4 are re-checked against the library. When an answer narrows the topic (for example, from general **property tax** to **pre-authorized tax payments**), the relevant guide and links update. Answered questions are preserved for the final call documentation. A **Refresh suggestions** action is also available.
+
+Sample scenarios:
+- `Sabrina is calling about property tax` → Property Tax Billing.
+- `I need to know the payment due date` → property tax due-date reference.
+- `I want to enrol in pre-authorized payments` → Pre-Authorized Tax Payment Program guide.
+- `Vacant Home Tax declaration` → Vacant Home Tax guide.
+
+There are **no live City website scrapes**, no active AI requests, and no API keys required for this matching. Questions are reviewed training templates rather than official City scripts.
+
+Run `node tests/guide-matching.test.js` locally to check all 20 guide categories and the property-tax refinement examples. For privacy, test only with fictional caller information.
