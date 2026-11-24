@@ -248,7 +248,7 @@
   }
   function resourcePanel(analysis) {
     const rows=(analysis.resources||[]).map(r=>`<a class="resourceLink" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(r.title)} in a new tab"><span class="resourceIcon" aria-hidden="true">↗</span><span class="resourceCopy"><span class="resourceTitle">${esc(r.title)}</span><span class="resourceMeta">${esc(r.origin)} · ${esc(r.detail)}</span></span></a>`).join('');
-    const info=analysis.referenceCoverage==='directory'?'No matching guide. Verify against the 311 directory.':analysis.guideId?`Approved portfolio guide ${analysis.guideId} · ${analysis.guideVolume2025.toLocaleString()} 2025 contacts/requests · Check current service details.`:'Questions are based on example public service guidance. Verify current information.';
+    const info=analysis.referenceCoverage==='possible-guides'?'Possible matches from the local service guide library · Confirm the issue before giving instructions.':analysis.referenceCoverage==='directory'?'No matching guide. Verify against the 311 directory.':analysis.guideId?`Approved portfolio guide ${analysis.guideId} · ${analysis.guideVolume2025.toLocaleString()} 2025 contacts/requests · Check current service details.`:'Questions are based on example public service guidance. Verify current information.';
     return `<div class="resources">${analysis.routingNote?`<div class="notice" role="status">${esc(analysis.routingNote)}</div>`:""}<div class="resourcesTitle">Relevant service information</div>${rows}<p class="probeStatus">${esc(info)}</p></div>`;
   }
   function callTypeChoices() {
@@ -290,7 +290,7 @@
       case 3:
         html='<div class="stepTag">04 · Probing & action</div>'+`<div class="splitGrid">
           <section class="workPanel probePanel" aria-label="Suggested probing questions"><div class="panelHeading"><span class="panelEyebrow">01</span><h2>Probing questions</h2></div>
-            <div class="probeActions"><button class="probeButton" id="suggest">↻ Refresh suggestions</button><span class="probeStatus" id="probeStatus">${source==='ai'?'AI ranked':guidance.guideId?'Reviewed guide':'General practice'} · ${esc(guidance.categoryLabel)}</span></div>
+            <div class="probeActions"><button class="probeButton" id="suggest">↻ Refresh suggestions</button><span class="probeStatus" id="probeStatus">${source==='ai'?'AI ranked':guidance.guideId?'Reviewed guide':guidance.referenceCoverage==='possible-guides'?'Clarifying service':'General practice'} · ${esc(guidance.categoryLabel)}</span></div>
             ${guidance.safetyNote?`<div class="notice" role="status">${esc(guidance.safetyNote)}</div>`:''}
             <div class="probes" id="probes">${data.probes.length?data.probes.map(probeCard).join(''):'<div class="emptyProbes">No further questions suggested based on the details captured.</div>'}</div>${data.probes.length<2?'<button class="textLink" id="add">+ Add a question</button>':''}<div id="serviceResources">${resourcePanel(guidance)}</div>
           </section>
@@ -422,7 +422,7 @@
     const a=analyzeCurrentCall();
     const panel=$('#serviceResources');if(panel)panel.innerHTML=resourcePanel(a);
     const status=$('#probeStatus');
-    if(status)status.textContent=(a.guideId?'Reviewed guide':'General practice')+' · '+a.categoryLabel;
+    if(status)status.textContent=(a.guideId?'Reviewed guide':a.referenceCoverage==='possible-guides'?'Clarifying service':'General practice')+' · '+a.categoryLabel;
   }
   function advance() {
     if(!canContinue()) return;
