@@ -144,6 +144,14 @@
     .notice {padding:12px 14px;background:#f5eee6;color:var(--alert);border-radius:9px;font-size:11px;line-height:1.5;margin-top:14px}
     .fade {animation:fade .3s ease both}
     @keyframes fade {from{opacity:.3;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .typeChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 22px}
+    .typeChoice{cursor:pointer;position:relative;display:flex;align-items:center;gap:10px;padding:15px 13px;background:#fffefa;border:1px solid var(--line);border-radius:11px;min-height:61px;color:#738676;font-weight:600;font-size:12px;line-height:1.4;transition:background .15s,border-color .15s}
+    .typeChoice.selected{background:#edf2ea;border-color:#7e9c81;color:#334f3a}
+    .typeChoice input{position:absolute;opacity:0;width:1px;height:1px}
+    .typeChoice:focus-within{outline:3px solid #a6c1aa;outline-offset:2px}
+    .typeMark{width:17px;height:17px;flex:none;border:1.5px solid #adc0af;border-radius:50%;display:grid;place-items:center;color:transparent;font-size:10px}
+    .typeChoice.selected .typeMark{background:#56735d;color:white;border-color:#56735d}
+    @media(max-width:550px){.typeChoices{grid-template-columns:1fr;gap:8px}.typeChoice{min-height:49px;padding:11px 12px}}
     @media(max-width:1130px){.shell{grid-template-columns:170px minmax(0,1fr) 230px}.left{padding:28px 13px}.right{padding:30px 16px}.main{padding:27px 35px 22px}.sideStep{font-size:11px;gap:7px}.brand{font-size:20px}}
     @media(max-width:900px){.shell{display:flex;flex-direction:column}.left{min-height:auto;padding:15px 22px;border-bottom:1px solid var(--line);border-right:0;gap:0}.sideSteps,.sideFooter{display:none}.right{display:none}.main{min-height:calc(100vh - 65px);padding:19px 27px 22px}.top {position:sticky;top:0;z-index:10;background:var(--paper);padding:5px 0 13px}.mobileClient {display:flex;align-items:center;gap:9px;border-radius:50px;padding:9px 12px;background:#e9f0e7;color:#587960;font-size:12px;font-weight:600;max-width:57%;overflow:hidden}.mobileClient .initial {border-radius:100%;width:24px;height:24px;flex:none;display:grid;place-items:center;background:#cfdfce;font-family:Georgia,serif}.mobileClient span:last-child {text-overflow:ellipsis;overflow:hidden;white-space:nowrap}.topTag {display:none}.stage{max-width:700px;min-height:480px}.progressTop{margin-top:17px}}
     @media(max-width:780px){.splitGrid{grid-template-columns:1fr}.stage.stageWide{max-width:700px}.workPanel{padding:20px}}
@@ -190,7 +198,7 @@
   'use strict';
   const stages = ['Basic information', 'Reason for calling', 'Paraphrase', 'Probing & action', 'Call notes'];
   const blank = () => ({
-    fullName: '', phone: '', email: '', address: '', reason: '', extra: '', probes: [], probeHistory: [], activeGuideId: '',
+    fullName: '', phone: '', email: '', address: '', reason: '', extra: '', callType: 'unsure', probes: [], probeHistory: [], activeGuideId: '',
     outcome: '', resolvedNotes: '', followupNotes: '', escalationTeam: '', escalationNotes: '',
     verified: { fullName: false, phone: false, email: false }
   });
@@ -243,6 +251,11 @@
     const info=analysis.referenceCoverage==='directory'?'No matching guide. Verify against the 311 directory.':analysis.guideId?`Approved portfolio guide ${analysis.guideId} · ${analysis.guideVolume2025.toLocaleString()} 2025 contacts/requests · Check current service details.`:'Questions are based on example public service guidance. Verify current information.';
     return `<div class="resources">${analysis.routingNote?`<div class="notice" role="status">${esc(analysis.routingNote)}</div>`:""}<div class="resourcesTitle">Relevant service information</div>${rows}<p class="probeStatus">${esc(info)}</p></div>`;
   }
+  function callTypeChoices() {
+    return `<div class="fieldGroup"><div class="fieldLabel">Type of call</div><div class="typeChoices" role="radiogroup" aria-label="Type of call">
+    ${[['general_inquiry','General inquiry'],['service_request','Service request'],['unsure','Not sure yet']].map(([id,label])=>`<label class="typeChoice ${data.callType===id?'selected':''}"><input type="radio" name="callType" value="${id}" ${data.callType===id?'checked':''}><span class="typeMark" aria-hidden="true">✓</span>${label}</label>`).join('')}
+    </div></div>`;
+  }
   function choice(id,number,label) {
     return `<label class="actionChoice ${data.outcome===id?'selected':''}"><input type="radio" name="outcome" value="${id}" ${data.outcome===id?'checked':''}><span class="choiceNumber">${number}</span><span class="choiceText">${label}</span></label>`;
   }
@@ -272,7 +285,7 @@
         html=head('02 · Understand','What can I help you with <em>today?</em>')+reasonField()+controls();
         break;
       case 2:
-        html=head('03 · Paraphrase','Thank you for explaining. <em>What I understand is…</em>')+`<div class="readback"><div class="readbackTitle">Reason for calling</div><p>${esc(lead())}</p></div>`+field('extra','Additional details','Add anything missed earlier…',{multi:true})+controls();
+        html=head('03 · Paraphrase','Thank you for explaining. <em>What I understand is…</em>')+`<div class="readback"><div class="readbackTitle">Reason for calling</div><p>${esc(lead())}</p></div>`+field('extra','Additional details','Add anything missed earlier…',{multi:true})+callTypeChoices()+controls();
         break;
       case 3:
         html='<div class="stepTag">04 · Probing & action</div>'+`<div class="splitGrid">
@@ -304,6 +317,7 @@
       `CONTACT\nFull name: ${val(data.fullName)}\nPhone: ${val(data.phone)}\nEmail: ${val(data.email)}\nAddress: ${val(data.address)}`,
       `REASON FOR CALL\n${lead()}`
     ];
+    if (data.callType!=='unsure') sections.push(`CALL TYPE\n${data.callType==='service_request'?'Service request':'General inquiry'}`);
     if (data.extra.trim()) sections.push(`ADDITIONAL DETAILS\n${data.extra.trim()}`);
     if (answers.length) sections.push(`INFORMATION CLARIFIED\n${answers.join('\n')}`);
     if (data.outcome) {
@@ -366,6 +380,7 @@
       }
     });
     $('#probes')?.addEventListener('click',e=>{if(e.target.matches('[data-remove]')){data.probes.splice(Number(e.target.dataset.remove),1);syncProbes(true);render();}});
+    document.querySelectorAll('input[name="callType"]').forEach(el=>el.addEventListener('change',()=>{data.callType=el.value;render();}));
     document.querySelectorAll('input[name="outcome"]').forEach(el=>el.addEventListener('change',()=>{data.outcome=el.value;render();}));
     document.querySelectorAll('[data-verify]').forEach(el=>el.addEventListener('change',()=>{data.verified[el.dataset.verify]=el.checked;}));
     $('#editContact')?.addEventListener('click',()=>setStep(0));
@@ -377,7 +392,7 @@
   // when answers change, and when the agent manually refreshes suggestions.
   function allProbeRecords() {return [...data.probeHistory,...data.probes];}
   function analyzeCurrentCall() {
-    return window.CallFlowProbing.analyze({issue:data.reason,details:data.extra,probes:allProbeRecords()});
+    return window.CallFlowProbing.analyze({issue:data.reason,details:data.extra,callType:data.callType,probes:allProbeRecords()});
   }
   function syncProbes(force=false) {
     let analysis=analyzeCurrentCall();
